@@ -4,124 +4,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel='icon' href='favicon.png' type='image/png' />
-    <style>
-        body {
-            background: url("background.jpg") no-repeat center center fixed;
-            text-align: center;
-            -webkit-background-size: cover;
-            -moz-background-size: cover;
-            -o-background-size: cover;
-            background-size: cover;
-        }
-
-        #title {
-            margin-top: 10vh;
-            font-size: xx-large;
-            color: white;
-        }
-
-        #description {
-            font-style: italic;
-            font-size: large;
-            color: coral;
-        }
-
-        #question {
-            margin-top: 10vh;
-            margin-bottom: 20px;
-            font-size: large;
-            color: wheat;
-        }
-
-        #questionImg {
-            width: 50vh;
-            opacity: 0.7;
-        }
-
-        .multiple-submit {
-            background-color: grey;
-            padding-top: 10px;
-            padding-bottom: 10px;
-            cursor: pointer;
-            width: 50vh;
-            text-align: center;
-            margin-top: 20px;
-            color: white;
-        }
-
-        #answers {
-            margin-top: 10px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .answer {
-            background-color: red;
-            padding-top: 10px;
-            padding-bottom: 10px;
-            background-color: darkred;
-            cursor: pointer;
-            width: 50vh;
-            text-align: center;
-            margin-top: 10px;
-            color: white;
-        }
-
-        .chosenAnswer {
-            background-color: orange;
-        }
-
-        .correctAnswer {
-            background-color: lightgreen;
-        }
-
-        .wrongAnswer {
-            background-color: coral;
-        }
-
-        #score {
-            margin-top: 20px;
-            font-size: xx-large;
-            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-            color: lightpink;
-        }
-
-        #resultImg {
-            width: 50vh;
-        }
-
-        #resultTitle,
-        #resultDescription {
-            font-size: x-large;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            color: aliceblue;
-        }
-
-
-        #restart {
-            font-size: xx-large;
-            color: blanchedalmond;
-            cursor: pointer;
-            display: none;
-            margin-top: 100px;
-        }
-
-        #mute,
-        #unmute {
-            width: 10vh;
-            position: fixed;
-            right: 50px;
-            bottom: 50px;
-            cursor: pointer;
-        }
-
-        #mute {
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css" />
 
 </head>
 
@@ -142,219 +25,30 @@
 
     <img src="./unmute.png" id="unmute"></img>
     <img src="./mute.png" id="mute"></img>
-    <script>
 
+    <script src="quiz.js"></script>
+
+    <script>
         var soundtrack = new Audio("GameofThrones.mp3");
-        soundtrack.play();
         soundtrack.loop = true;
+        soundtrack.play();
         var audioIsPlaying = true;
 
         const toggleSoundtrack = () => {
             audioIsPlaying = !audioIsPlaying;
             if (audioIsPlaying) {
                 soundtrack.play();
-                document.getElementById('mute').style.display = "none";
-                document.getElementById('unmute').style.display = "block";
-            }
-            else {
+                document.getElementById("mute").style.display = "none";
+                document.getElementById("unmute").style.display = "block";
+            } else {
                 soundtrack.pause();
-                document.getElementById('mute').style.display = "block";
-                document.getElementById('unmute').style.display = "none";
+                document.getElementById("mute").style.display = "block";
+                document.getElementById("unmute").style.display = "none";
             }
-        }
-
-        document.getElementById('mute').addEventListener('click', toggleSoundtrack)
-        document.getElementById('unmute').addEventListener('click', toggleSoundtrack)
-
-        var quizData = {
-            quiz: null,
-            results: null,
-            questionIndex: 0,
-            score: 0
-        }
-
-        const fetchQuiz = async () => {
-            return new Promise(async (resolve, reject) => {
-
-                let quiz, results;
-
-                let response = await fetch("http://proto.io/en/jobs/candidate-questions/quiz.json");
-                if (response.status == 200) {
-                    let responseBody = await response.text();
-                    quiz = JSON.parse(responseBody);
-                }
-                else {
-                    reject();
-                }
-
-                response = await fetch("http://proto.io/en/jobs/candidate-questions/result.json");
-                if (response.status == 200) {
-                    let responseBody = await response.text();
-                    results = JSON.parse(responseBody);
-                    resolve({ quiz, results });
-                }
-                else {
-                    reject();
-                }
-            })
         };
 
-        const loadQuiz = () => {
-            const { quiz } = quizData;
-            let title = quiz.title;
-            let description = quiz.description;
-            document.getElementById('title').innerHTML = title;
-            document.getElementById('description').innerHTML = description;
-        };
-
-        const removeElements = (elms) => elms.forEach(el => el.remove());
-
-        const generateAnswers = (question_type, possible_answers) => {
-
-            let answers = [];
-
-            if (question_type === "truefalse") {
-                possible_answers = [{ caption: 'True', a_id: "true" }, { caption: 'False', a_id: "false" }];
-            }
-
-            possible_answers.forEach(answer => {
-                let answerElement = document.createElement('div');
-                answerElement.className = `${question_type} answer`;
-                answerElement.innerHTML = answer.caption;
-                answerElement.setAttribute('data-answerid', answer['a_id'])
-                answerElement.addEventListener('click', (ev) => {
-                    chooseAnswer(ev);
-                    if (question_type !== 'mutiplechoice-multiple')
-                        validateAnswer();
-                });
-                answers.push(answerElement);
-            });
-
-            if (question_type === "mutiplechoice-multiple") {
-                let answerElement = document.createElement('div');
-                answerElement.className = `multiple-submit`;
-                answerElement.innerHTML = 'Submit';
-                answerElement.addEventListener('click', validateAnswer);
-                answers.push(answerElement);
-            }
-
-            return answers;
-        }
-
-        const chooseAnswer = (event) => {
-            const { quiz, questionIndex } = quizData;
-            const { questions } = quiz;
-            var question = questions[questionIndex];
-            const { correct_answer, question_type } = question;
-
-            let selectedAnswer = event.target;
-            selectedAnswer.classList.add('chosenAnswer');
-        }
-
-        const validateAnswer = (event) => {
-
-            const { quiz, questionIndex } = quizData;
-            const { questions } = quiz;
-            var question = questions[questionIndex];
-            const { correct_answer, question_type, points } = question;
-
-            // highlight green all correct answers
-            if (question_type === 'mutiplechoice-multiple') {
-                correct_answer.forEach(correctAnswer => {
-                    document.querySelector(`[data-answerid='${correctAnswer}']`).classList.add('correctAnswer');
-                })
-            }
-            else {
-                let correctAnswer = document.querySelector(`[data-answerid='${correct_answer}']`)
-                correctAnswer.classList.add('correctAnswer');
-            }
-
-            // highlight red invalid answers
-            let chosenAnswers = document.querySelectorAll('.chosenAnswer');
-            let isCorrect = true;
-            chosenAnswers.forEach(answer => {
-                let answerNo = answer.getAttribute("data-answerid");
-                if (question_type === 'mutiplechoice-multiple') {
-                    if (correct_answer.indexOf(Number(answerNo)) === -1) {
-                        answer.classList.add('wrongAnswer');
-                        isCorrect = false;
-                    }
-                }
-                else {
-                    if (correct_answer !== Number(answerNo)) {
-                        answer.classList.add('wrongAnswer');
-                        isCorrect = false
-                    }
-                }
-            });
-
-            if (isCorrect)
-                quizData.score += points;
-
-            document.getElementById('score').innerHTML = `Score: ${quizData.score}`;
-
-            setTimeout(() => {
-                removeElements(document.querySelectorAll(".answer,.multiple-submit"));
-                document.getElementById('score').innerHTML = "";
-                quizData.questionIndex++;
-                nextQuestion()
-            }, 300)
-        }
-
-        const nextQuestion = () => {
-            const { quiz, questionIndex } = quizData;
-            const { questions } = quiz;
-            if (questionIndex !== questions.length - 1) {
-                var question = questions[questionIndex];
-                const { q_id, title, img, question_type, possible_answers, correct_answer, points } = question;
-                document.getElementById('question').innerHTML = `${questionIndex + 1}. ${title}`;
-                document.getElementById('questionImg').setAttribute("src", img);
-                const answersElements = generateAnswers(question_type, possible_answers);
-                answersElements.forEach(answer => document.getElementById('answers').appendChild(answer))
-            }
-            else {
-                endQuiz()
-            }
-        }
-
-        const endQuiz = () => {
-
-            const { results, score } = quizData;
-
-            let result = results.filter(result => Number(score) >= result.minpoints && Number(score) <= result.maxpoints)
-
-            const { img, title, message } = result[0];
-
-            document.getElementById('score').innerHTML = `Score: ${score}`;
-            document.getElementById('resultTitle').innerHTML = title;
-            document.getElementById('resultImg').src = img;
-            document.getElementById('resultDescription').innerHTML = message;
-            document.getElementById('questionImg').setAttribute("src", "");
-            document.getElementById('question').innerHTML = "";
-            document.getElementById('restart').style.display = "block";
-            document.getElementById('restart').addEventListener('click', startQuiz)
-        }
-
-        const startQuiz = () => {
-            document.getElementById('restart').style.display = "none";
-            document.getElementById('score').innerHTML = ``;
-            document.getElementById('resultTitle').innerHTML = "";
-            document.getElementById('resultImg').src = "";
-            document.getElementById('resultDescription').innerHTML = "";
-            quizData.score = 0;
-            quizData.questionIndex = 0;
-            nextQuestion();
-        };
-
-        (async () => {
-            const { quiz, results } = await fetchQuiz();
-            quizData.quiz = quiz;
-            quizData.results = results.results;
-            console.log(quizData);
-
-            loadQuiz();
-            startQuiz();
-        })();
+        document.getElementById("mute").addEventListener("click", toggleSoundtrack);
+        document.getElementById("unmute").addEventListener("click", toggleSoundtrack);
 
     </script>
 

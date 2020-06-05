@@ -1,0 +1,115 @@
+body {
+  background: url("background.jpg") no-repeat center center fixed;
+  text-align: center;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+#title {
+  margin-top: 10vh;
+  font-size: xx-large;
+  color: white;
+}
+
+#description {
+  font-style: italic;
+  font-size: large;
+  color: coral;
+}
+
+#question {
+  margin-top: 10vh;
+  margin-bottom: 20px;
+  font-size: large;
+  color: wheat;
+}
+
+#questionImg {
+  width: 50vh;
+  opacity: 0.7;
+}
+
+.multiple-submit {
+  background-color: grey;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  cursor: pointer;
+  width: 50vh;
+  text-align: center;
+  margin-top: 20px;
+  color: white;
+}
+
+#answers {
+  margin-top: 10px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.answer {
+  background-color: red;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: darkred;
+  cursor: pointer;
+  width: 50vh;
+  text-align: center;
+  margin-top: 10px;
+  color: white;
+}
+
+.chosenAnswer {
+  background-color: orange;
+}
+
+.correctAnswer {
+  background-color: lightgreen;
+}
+
+.wrongAnswer {
+  background-color: coral;
+}
+
+#score {
+  margin-top: 20px;
+  font-size: xx-large;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  color: lightpink;
+}
+
+#resultImg {
+  width: 50vh;
+}
+
+#resultTitle,
+#resultDescription {
+  font-size: x-large;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  color: aliceblue;
+}
+
+#restart {
+  font-size: xx-large;
+  color: blanchedalmond;
+  cursor: pointer;
+  display: none;
+  margin-top: 100px;
+}
+
+#mute,
+#unmute {
+  width: 10vh;
+  position: fixed;
+  right: 50px;
+  bottom: 50px;
+  cursor: pointer;
+}
+
+#mute {
+  display: none;
+}
