@@ -1,3 +1,9 @@
+const QUESTION_TYPES = {
+  MULTIPLE: "mutiplechoice-multiple",
+  SINGLE: "mutiplechoice-single",
+  BOOLEAN: "truefalse",
+};
+
 var quizData = {
   quiz: null,
   results: null,
@@ -57,7 +63,7 @@ const removeElements = (elms) => elms.forEach((el) => el.remove());
 const generateAnswers = (question_type, possible_answers) => {
   let answers = [];
 
-  if (question_type === "truefalse") {
+  if (question_type === QUESTION_TYPES.BOOLEAN) {
     possible_answers = [
       { caption: "True", a_id: "true" },
       { caption: "False", a_id: "false" },
@@ -69,32 +75,36 @@ const generateAnswers = (question_type, possible_answers) => {
     answerElement.className = `${question_type} answer`;
     answerElement.innerHTML = answer.caption;
     answerElement.setAttribute("data-answerid", answer["a_id"]);
-    answerElement.addEventListener("click", (ev) => {
-      chooseAnswer(ev);
-      if (question_type !== "mutiplechoice-multiple") validateAnswer();
-    });
+    answerElement.addEventListener("click", clickAnswer);
     answers.push(answerElement);
   });
 
-  if (question_type === "mutiplechoice-multiple") {
-    let answerElement = document.createElement("div");
-    answerElement.className = `multiple-submit`;
-    answerElement.innerHTML = "Submit";
-    answerElement.addEventListener("click", validateAnswer);
-    answers.push(answerElement);
-  }
+  let answerElement = document.createElement("div");
+  answerElement.className = `multiple-submit`;
+  answerElement.innerHTML = "Next Question";
+  answerElement.addEventListener("click", validateAnswer);
+  answers.push(answerElement);
 
   return answers;
 };
 
-const chooseAnswer = (event) => {
-  const { quiz, questionIndex } = quizData;
-  const { questions } = quiz;
-  var question = questions[questionIndex];
-  const { correct_answer, question_type } = question;
+const clickAnswer = (event) => {
+  const {
+    quiz: { questions },
+    questionIndex,
+  } = quizData;
+
+  if (questions[questionIndex].question_type != QUESTION_TYPES.MULTIPLE) {
+    let currentAnswer = document.querySelector(".chosenAnswer");
+    if (currentAnswer) {
+      currentAnswer.classList.remove("chosenAnswer");
+    }
+  }
 
   let selectedAnswer = event.target;
-  selectedAnswer.classList.add("chosenAnswer");
+  if (!selectedAnswer.classList.contains("chosenAnswer"))
+    selectedAnswer.classList.add("chosenAnswer");
+  else selectedAnswer.classList.remove("chosenAnswer");
 };
 
 const validateAnswer = (event) => {
@@ -103,38 +113,35 @@ const validateAnswer = (event) => {
   var question = questions[questionIndex];
   const { correct_answer, question_type, points } = question;
 
-  // highlight green all correct answers
-  if (question_type === "mutiplechoice-multiple") {
-    correct_answer.forEach((correctAnswer) => {
-      document
-        .querySelector(`[data-answerid='${correctAnswer}']`)
-        .classList.add("correctAnswer");
-    });
-  } else {
-    let correctAnswer = document.querySelector(
-      `[data-answerid='${correct_answer}']`
-    );
-    correctAnswer.classList.add("correctAnswer");
-  }
+  let correctAnswers = Array.isArray(correct_answer)
+    ? correct_answer
+    : [correct_answer];
+
+  correctAnswers.forEach((correctAnswer) => {
+    document
+      .querySelector(`[data-answerid='${correctAnswer}']`)
+      .classList.add("correctAnswer");
+  });
+
+  let correctAnswersMap = {};
+
+  correctAnswers.forEach((answer) => (correctAnswersMap[answer] = true));
 
   // highlight red invalid answers
   let chosenAnswers = document.querySelectorAll(".chosenAnswer");
   let isCorrect = true;
+
   chosenAnswers.forEach((answer) => {
     let answerNo = answer.getAttribute("data-answerid");
-    if (question_type === "mutiplechoice-multiple") {
-      if (correct_answer.indexOf(Number(answerNo)) === -1) {
-        answer.classList.add("wrongAnswer");
-        isCorrect = false;
-      }
+    if (!correctAnswersMap[answerNo]) {
+      answer.classList.add("wrongAnswer");
+      isCorrect = false;
     } else {
-      if (String(correct_answer) !== String(answerNo)) {
-        answer.classList.add("wrongAnswer");
-        isCorrect = false;
-      }
+      delete correctAnswersMap[answerNo];
     }
   });
 
+  if (Object.keys(correctAnswersMap).length !== 0) isCorrect = false;
   if (isCorrect) quizData.score += points;
 
   document.getElementById("score").innerHTML = `Score: ${quizData.score}`;
@@ -150,7 +157,7 @@ const validateAnswer = (event) => {
 const nextQuestion = () => {
   const { quiz, questionIndex } = quizData;
   const { questions } = quiz;
-  if (questionIndex !== questions.length - 1) {
+  if (questionIndex !== questions.length) {
     var question = questions[questionIndex];
     const {
       q_id,
@@ -178,8 +185,6 @@ const endQuiz = () => {
   const { results, score, maxPoints } = quizData;
 
   let percentageScore = (score / maxPoints) * 100;
-
-  console.log(percentageScore);
 
   let result = results.filter(
     (result) =>

@@ -60,6 +60,7 @@ body {
   text-align: center;
   margin-top: 10px;
   color: white;
+  border-radius: 10px;
 }
 
 .chosenAnswer {
@@ -112,4 +113,8 @@ body {
 
 #mute {
   display: none;
+}
+
+img {
+  border-radius: 10px;
 }
