@@ -32,9 +32,7 @@
     <script>
         var soundtrack = new Audio("GameofThrones.mp3");
         soundtrack.loop = true;
-        soundtrack.autoplay = true;
-        var audioIsPlaying = true;
-
+        var audioIsPlaying = false;
 
         const toggleSoundtrack = () => {
             audioIsPlaying = !audioIsPlaying;
