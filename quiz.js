@@ -6,6 +6,8 @@ const QUESTION_TYPES = {
   BOOLEAN: "truefalse",
 };
 
+const QUESTION_DELAY = 3000;
+
 class Quiz {
   questions = null;
   results = null;
@@ -23,10 +25,16 @@ class Quiz {
     this.calculateMaxPoints();
   }
 
+  /** Set Quiz results
+   * @param  {string} results
+   */
   setResults = (results) => {
     this.results = results;
   };
 
+  /**
+   * Clear any previous quiz content and start new quiz
+   */
   startQuiz = () => {
     document.getElementById("restart").style.display = "none";
     document.getElementById("score").innerHTML = ``;
@@ -40,8 +48,11 @@ class Quiz {
     this.nextQuestion();
   };
 
+  /**
+   * Calculates the percentage score and displays it
+   */
   endQuiz = () => {
-    let percentageScore = Math.round(this.score / this.maxPoints) * 100;
+    let percentageScore = Math.round((this.score / this.maxPoints) * 100);
 
     let result = this.results.filter(
       (result) =>
@@ -63,6 +74,9 @@ class Quiz {
       .addEventListener("click", this.startQuiz);
   };
 
+  /**
+   * Calculates the maximum possible points of the quiz
+   */
   calculateMaxPoints = () => {
     this.maxPoints = this.questions.reduce(
       (acc, question) => acc + question.points,
@@ -70,6 +84,9 @@ class Quiz {
     );
   };
 
+  /**
+   * Gets the next question and displays it to the user
+   */
   nextQuestion = () => {
     if (this.questionIndex !== this.questions.length) {
       var question = this.questions[this.questionIndex];
@@ -98,6 +115,12 @@ class Quiz {
     }
   };
 
+  /**
+   *  Returns a questions possible answers as an array of DOM elements;
+   *
+   * @param  {} question_type
+   * @param  {} possible_answers
+   */
   generateQuestionAnswers = (question_type, possible_answers) => {
     let answers = [];
 
@@ -126,6 +149,11 @@ class Quiz {
     return answers;
   };
 
+  /**
+   *  Selects or deselects the answer user has clicked
+   *
+   * @param  {} event
+   */
   clickAnswer = (event) => {
     if (
       this.questions[this.questionIndex].question_type !=
@@ -143,6 +171,11 @@ class Quiz {
     else selectedAnswer.classList.remove("chosenAnswer");
   };
 
+  /**
+   * Validates the current question
+   *
+   * @param  {} event
+   */
   validateAnswer = (event) => {
     var question = this.questions[this.questionIndex];
     const { correct_answer, points } = question;
@@ -176,17 +209,23 @@ class Quiz {
     });
 
     if (Object.keys(correctAnswersMap).length !== 0) isCorrect = false;
-    if (isCorrect) this.score += points;
 
-    document.getElementById("score").innerHTML = `Score: ${this.score}`;
+    if (isCorrect) this.increaseScore(points);
 
     setTimeout(() => {
       removeElements(document.querySelectorAll(".answer,.multiple-submit"));
-      document.getElementById("score").innerHTML = "";
       this.questionIndex++;
       this.nextQuestion();
-    }, 300);
+    }, QUESTION_DELAY);
   };
+
+  /**
+   * Increases current score based on given points
+   *
+   * @param  {} points
+   * @param  {} =>(this.score+=points
+   */
+  increaseScore = (points) => (this.score += points);
 }
 
 const fetchQuiz = async () => {

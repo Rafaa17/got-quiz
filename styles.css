@@ -32,14 +32,16 @@ body {
 }
 
 .multiple-submit {
-  background-color: grey;
+  background-color: lightslategray;
   padding-top: 10px;
   padding-bottom: 10px;
   cursor: pointer;
   width: 50vh;
   text-align: center;
-  margin-top: 20px;
+  margin-top: 40px;
   color: white;
+  font-size: large;
+  border-radius: 10px;
 }
 
 #answers {
@@ -51,7 +53,6 @@ body {
 }
 
 .answer {
-  background-color: red;
   padding-top: 10px;
   padding-bottom: 10px;
   background-color: darkred;
@@ -61,6 +62,8 @@ body {
   margin-top: 10px;
   color: white;
   border-radius: 10px;
+  font-size: large;
+  transition: 0.5s ease all;
 }
 
 .chosenAnswer {
