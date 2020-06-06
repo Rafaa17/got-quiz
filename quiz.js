@@ -17,25 +17,19 @@ class Quiz {
   title = "";
   description = "";
 
-  constructor(quiz) {
+  constructor(quiz, results) {
     const { title, description, questions } = quiz;
     this.title = title;
     this.description = description;
     this.questions = questions;
-    this.calculateMaxPoints();
-  }
-
-  /** Set Quiz results
-   * @param  {string} results
-   */
-  setResults = (results) => {
     this.results = results;
-  };
+  }
 
   /**
    * Clear any previous quiz content and start new quiz
    */
   startQuiz = () => {
+    this.calculateMaxPoints();
     document.getElementById("restart").style.display = "none";
     document.getElementById("score").innerHTML = ``;
     document.getElementById("resultTitle").innerHTML = "";
@@ -66,6 +60,7 @@ class Quiz {
     document.getElementById("resultTitle").innerHTML = title;
     document.getElementById("resultImg").src = img;
     document.getElementById("resultDescription").innerHTML = message;
+    document.getElementById("questionsLeft").innerHTML = "";
     document.getElementById("questionImg").setAttribute("src", "");
     document.getElementById("question").innerHTML = "";
     document.getElementById("restart").style.display = "block";
@@ -102,9 +97,13 @@ class Quiz {
       document.getElementById("question").innerHTML = `${
         this.questionIndex + 1
       }. ${title}`;
+      document.getElementById("questionsLeft").innerHTML = `Question ${
+        this.questionIndex + 1
+      } of ${this.questions.length}`;
       document.getElementById("questionImg").style.display = "none";
       document.getElementById("questionImg").setAttribute("src", img);
       document.getElementById("questionImg").style.display = "inline-block";
+      document.getElementById("questionImg").classList.remove("correctImg");
       const answersElements = this.generateQuestionAnswers(
         question_type,
         possible_answers
@@ -212,7 +211,16 @@ class Quiz {
 
     if (Object.keys(correctAnswersMap).length !== 0) isCorrect = false;
 
-    if (isCorrect) this.increaseScore(points);
+    if (isCorrect) {
+      this.increaseScore(points);
+      document.getElementById("questionImg").classList.add("correctImg");
+    }
+
+    document
+      .querySelectorAll(".answer")
+      .forEach((answer) =>
+        answer.removeEventListener("click", this.clickAnswer)
+      );
 
     setTimeout(() => {
       removeElements(document.querySelectorAll(".answer,.multiple-submit"));
@@ -231,35 +239,32 @@ class Quiz {
 }
 
 const fetchQuiz = async () => {
-  return new Promise(async (resolve, reject) => {
-    let quiz, results;
+  let quiz, results;
 
-    let response = await fetch(
-      "http://proto.io/en/jobs/candidate-questions/quiz.json"
-    );
-    if (response.status == 200) {
-      let responseBody = await response.text();
-      quiz = JSON.parse(responseBody);
-    } else {
-      reject();
-    }
+  let response = await fetch(
+    "http://proto.io/en/jobs/candidate-questions/quiz.json"
+  );
+  if (response.status == 200) {
+    let responseBody = await response.text();
+    quiz = JSON.parse(responseBody);
+  } else {
+    return null;
+  }
 
-    response = await fetch(
-      "http://proto.io/en/jobs/candidate-questions/result.json"
-    );
-    if (response.status == 200) {
-      let responseBody = await response.text();
-      results = JSON.parse(responseBody)["results"];
-      resolve({ quiz, results });
-    } else {
-      reject();
-    }
-  });
+  response = await fetch(
+    "http://proto.io/en/jobs/candidate-questions/result.json"
+  );
+  if (response.status == 200) {
+    let responseBody = await response.text();
+    results = JSON.parse(responseBody)["results"];
+    return { quiz, results };
+  } else {
+    return null;
+  }
 };
 
 (async () => {
   const { quiz: quizData, results } = await fetchQuiz();
-  let quiz = new Quiz(quizData);
-  quiz.setResults(results);
+  let quiz = new Quiz(quizData, results);
   quiz.startQuiz();
 })();

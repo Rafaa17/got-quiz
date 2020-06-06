@@ -14,8 +14,9 @@
         <div id="title"></div>
         <div id="description"></div>
         <div id="question"></div>
-        <img id="questionImg"></img>
+        <img class="questionImg" id="questionImg"></img>
         <div id="answers"></div>
+        <div id="questionsLeft"></div>
         <div id="score"></div>
         <div id="resultTitle"></div>
         <img id="resultImg"></img>
@@ -31,7 +32,10 @@
     <script>
         var soundtrack = new Audio("GameofThrones.mp3");
         soundtrack.loop = true;
-        soundtrack.play();
+        soundtrack.play().catch(err => {
+            toggleSoundtrack();
+            toggleSoundtrack();
+        });
         var audioIsPlaying = true;
 
         const toggleSoundtrack = () => {
