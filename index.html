@@ -32,11 +32,12 @@
     <script>
         var soundtrack = new Audio("GameofThrones.mp3");
         soundtrack.loop = true;
+        var audioIsPlaying = true;
+
         soundtrack.play().catch(err => {
             toggleSoundtrack();
             toggleSoundtrack();
         });
-        var audioIsPlaying = true;
 
         const toggleSoundtrack = () => {
             audioIsPlaying = !audioIsPlaying;
