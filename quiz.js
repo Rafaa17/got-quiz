@@ -242,7 +242,7 @@ const fetchQuiz = async () => {
   let quiz, results;
 
   let response = await fetch(
-    "http://proto.io/en/jobs/candidate-questions/quiz.json"
+    "https://proto.io/en/jobs/candidate-questions/quiz.json"
   );
   if (response.status == 200) {
     let responseBody = await response.text();
@@ -252,7 +252,7 @@ const fetchQuiz = async () => {
   }
 
   response = await fetch(
-    "http://proto.io/en/jobs/candidate-questions/result.json"
+    "https://proto.io/en/jobs/candidate-questions/result.json"
   );
   if (response.status == 200) {
     let responseBody = await response.text();
