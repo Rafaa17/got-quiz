@@ -102,7 +102,9 @@ class Quiz {
       document.getElementById("question").innerHTML = `${
         this.questionIndex + 1
       }. ${title}`;
+      document.getElementById("questionImg").style.display = "none";
       document.getElementById("questionImg").setAttribute("src", img);
+      document.getElementById("questionImg").style.display = "inline-block";
       const answersElements = this.generateQuestionAnswers(
         question_type,
         possible_answers

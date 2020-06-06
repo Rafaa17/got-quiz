@@ -29,6 +29,16 @@ body {
 #questionImg {
   width: 50vh;
   opacity: 0.7;
+  animation: fadein 2s ease-in;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.7;
+  }
 }
 
 .multiple-submit {
