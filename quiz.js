@@ -178,6 +178,20 @@ class Quiz {
    * @param  {} event
    */
   validateAnswer = (event) => {
+    // prevent highlighting other question
+    document
+      .querySelectorAll(".answer")
+      .forEach((answer) =>
+        answer.removeEventListener("click", this.clickAnswer)
+      );
+
+    // prevent double click fast
+    document
+      .querySelectorAll(".multiple-submit")
+      .forEach((answer) =>
+        answer.removeEventListener("click", this.validateAnswer)
+      );
+
     var question = this.questions[this.questionIndex];
     const { correct_answer, points } = question;
 
@@ -215,12 +229,6 @@ class Quiz {
       this.increaseScore(points);
       document.getElementById("questionImg").classList.add("correctImg");
     }
-
-    document
-      .querySelectorAll(".answer")
-      .forEach((answer) =>
-        answer.removeEventListener("click", this.clickAnswer)
-      );
 
     setTimeout(() => {
       removeElements(document.querySelectorAll(".answer,.multiple-submit"));
